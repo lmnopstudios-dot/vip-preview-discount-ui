@@ -1,5 +1,4 @@
-import { json } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const action = async ({ request }) => {
@@ -26,7 +25,7 @@ export const action = async ({ request }) => {
     }
   `);
 
-  return json(await response.json());
+  return await response.json();
 };
 
 export default function Index() {

@@ -2,30 +2,41 @@ import { useFetcher } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const action = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
+  try {
+    const { admin } = await authenticate.admin(request);
 
-  const response = await admin.graphql(`
-    mutation {
-      discountAutomaticAppCreate(
-        automaticAppDiscount: {
-          title: "VIP TEST"
-          functionHandle: "discount-function"
-          discountClasses: [PRODUCT]
-          startsAt: "2026-04-30T00:00:00Z"
-        }
-      ) {
-        automaticAppDiscount {
-          discountId
-        }
-        userErrors {
-          field
-          message
+    const response = await admin.graphql(`
+      mutation {
+        discountAutomaticAppCreate(
+          automaticAppDiscount: {
+            title: "VIP TEST"
+            functionHandle: "discount-function"
+            discountClasses: [PRODUCT]
+            startsAt: "2026-04-30T00:00:00Z"
+          }
+        ) {
+          automaticAppDiscount {
+            discountId
+          }
+          userErrors {
+            field
+            message
+          }
         }
       }
-    }
-  `);
+    `);
 
-  return await response.json();
+    return await response.json();
+  } catch (error) {
+    console.error("CREATE_DISCOUNT_ERROR", JSON.stringify(error, null, 2));
+
+    return {
+      ok: false,
+      message: error?.message || "Unknown error",
+      graphQLErrors: error?.body?.errors?.graphQLErrors || error?.graphQLErrors || null,
+      raw: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+    };
+  }
 };
 
 export default function Index() {
@@ -40,7 +51,9 @@ export default function Index() {
       </fetcher.Form>
 
       {fetcher.data && (
-        <pre>{JSON.stringify(fetcher.data, null, 2)}</pre>
+        <pre style={{ whiteSpace: "pre-wrap" }}>
+          {JSON.stringify(fetcher.data, null, 2)}
+        </pre>
       )}
     </div>
   );

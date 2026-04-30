@@ -6,14 +6,25 @@ export const action = async ({ request }) => {
     const { admin } = await authenticate.admin(request);
 
     const response = await admin.graphql(`
-      query {
-        currentAppInstallation {
-          accessScopes {
-            handle
-          }
-        }
+  mutation {
+    discountAutomaticAppCreate(
+      automaticAppDiscount: {
+        title: "Bank Holiday Sale"
+        functionHandle: "discount-function"
+        discountClasses: [PRODUCT]
+        startsAt: "2026-04-30T00:00:00Z"
       }
-    `);
+    ) {
+      automaticAppDiscount {
+        discountId
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`);
 
     return await response.json();
   } catch (error) {

@@ -1,0 +1,26 @@
+query CartInput {
+  cart {
+    buyerIdentity {
+      customer {
+        hasAnyTag(tags: ["viptest"])
+      }
+    }
+    deliveryGroups {
+      id
+    }
+    lines {
+      id
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          product {
+            inAnyCollection(ids: ["gid://shopify/Collection/672042615111"])
+          }
+        }
+      }
+    }
+  }
+  discount {
+    discountClasses
+  }
+}
